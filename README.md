@@ -97,5 +97,4 @@ The report includes:
 - Training configuration and hyperparameter selection  
 - Quantitative evaluation and ablation studies  
 
-## 📂 Repository Structure
 
