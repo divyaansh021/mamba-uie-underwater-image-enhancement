@@ -1,53 +1,101 @@
-Mamba-UIE Project
------------------
-This folder contains all code, dataset links, and configurations to train or evaluate the Mamba-UIE underwater image enhancement model on the UIEB dataset.
+# Improved Mamba-UIE: Learnable GBL and Adaptive Loss for Underwater Image Enhancement
 
-🧩 Setup Instructions
-1. Install Python 3.9 or above.
-2. Create a new environment and install dependencies:
-   pip install -r requirements.txt
+This project enhances a physics-aware underwater image restoration framework by introducing learnable illumination modeling and adaptive optimization strategies.
 
-⚙️ Training (starts from scratch or resumes automatically)
-   python main.py
+The objective of this work is to improve physical consistency, optimization stability, and perceptual quality without increasing architectural complexity.
 
-📈 Evaluation (runs automatically after each epoch)
-   - Saves up to 100 enhanced test images per epoch in subfolders.
-   - Calculates PSNR, SSIM, UIQM, UCIQE, and MSE metrics.
+---
 
-📂 Folder Notes:
-- Datasets/UIEB/
-    ├── train_raw/          : Raw underwater training images
-    ├── train_reference/    : Ground truth training images
-    ├── test_raw/           : Raw underwater test images
-    └── test_reference/     : Ground truth test images
+## 🚀 Key Improvements
 
-- Training_Results_UIEB/
-    ├── epoch_1.pth, epoch_2.pth, ...          : Model checkpoints per epoch
-    ├── temp_epoch1_iter300.pth                : Mid-epoch backup checkpoints
-    ├── epoch_1_samples/, epoch_2_samples/     : Saved comparison images (RAW | ENHANCED | REFERENCE)
-    ├── metrics_log.csv                        : Epoch-wise metrics (Train/Val Loss, PSNR, SSIM, etc.)
-    ├── loss_log.csv                           : Training and validation loss across epochs
-    ├── *_vs_Epoch.png                         : Plots for all metrics vs. epoch
+### 1️⃣ Learnable Global Background Light (GBL)
 
-currently the weights of 51st epoch is saved so training will continue from 52nd. If you want to start training from beginning then delete that weight or change the location of save folder.
+Replaced heuristic background light estimation with a trainable module.
 
-🧮 Metrics Tracked:
-- PSNR, SSIM (Full-reference)
-- UIQM, UCIQE (No-reference)
-- MSE, Train/Validation Loss
+- Global average pooling for scene-level color statistics  
+- Lightweight MLP for illumination prediction  
+- Sigmoid-bounded output to preserve physical validity  
+- Regularization for stable optimization  
 
-🖼️ To Save Fewer Validation Images:
-Inside `main.py`, search for:
-   if i < min(100, len(test_loader)):
-Change `100` to your desired number, e.g. `10` to save only 10 enhanced samples per epoch.
+Updated formation model:
 
-🧠 Environment Info:
-- PyTorch 2.4.0 + CUDA 12.1
-- NumPy, OpenCV, scikit-image, pandas, matplotlib
-- Mamba-SSM 2.2.2
-- causal-conv1d 1.4.0
+I'(x) = J(x)TD(x) + (1 − TB(x))Aθ
 
-📘 Notes:
-- Training automatically resumes from the latest checkpoint found in the results folder.
-- The results folder is created automatically at the start of training.
-- All saved plots and logs are updated after each epoch.
+---
+
+### 2️⃣ Adaptive Softmax-Based Loss Reweighting
+
+Introduced dynamic loss balancing instead of fixed manual weights:
+
+w_i = exp(-αL_i) / Σ exp(-αL_j)
+
+Benefits:
+- Automatic balancing of multi-term losses  
+- Reduced hyperparameter tuning  
+- Curriculum-style training behavior  
+- Improved convergence stability  
+
+Cosine annealing temperature scheduling applied for smooth optimization.
+
+---
+
+### 3️⃣ Smooth L1 Reconstruction Loss
+
+Replaced standard L2 reconstruction loss with Smooth L1 to:
+
+- Reduce sensitivity to outliers  
+- Stabilize transmission map prediction  
+- Prevent gradient explosion  
+- Improve structural preservation  
+
+---
+
+### 4️⃣ Curved Channel Attention (CCA)
+
+Introduced wavelength-aware channel attention to model nonlinear RGB attenuation in underwater environments, improving illumination consistency and color restoration.
+
+---
+
+## 📊 Quantitative Results (UIEB Dataset)
+
+| Metric | Before | After |
+|--------|--------|-------|
+| PSNR   | 23.50  | 23.93 |
+| SSIM   | 0.9049 | 0.9198 |
+| UIQM   | 3.148  | 3.242 |
+
+### Performance Improvements:
+- +0.43 dB PSNR  
+- +0.015 SSIM  
+- +0.093 UIQM  
+
+All improvements achieved without increasing model complexity.
+
+---
+
+## ⚙️ Training Setup
+
+- Dataset: UIEB (800 training / 90 validation images)  
+- Input Resolution: 256 × 256  
+- Optimizer: Adam (1e-4)  
+- Scheduler: Cosine Annealing  
+- Epochs: 50  
+- Batch Size: 1  
+- GPU: NVIDIA T4  
+
+---
+
+The complete technical documentation of this work is available in the repository:
+
+📄 **DL_REPORT_MAMBA_UIE_EE23BT021.pdf**
+
+The report includes:
+
+- Mathematical formulation of the updated image formation model  
+- Implementation details of the learnable GBL module  
+- Adaptive loss reweighting derivation  
+- Training configuration and hyperparameter selection  
+- Quantitative evaluation and ablation studies  
+
+## 📂 Repository Structure
+
