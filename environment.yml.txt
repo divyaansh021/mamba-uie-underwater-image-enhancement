@@ -1,0 +1,29 @@
+name: mamba
+channels:
+  - pytorch
+  - nvidia
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+  - defaults
+dependencies:
+  - python=3.10.14
+  - pip
+  - ffmpeg
+  - freetype
+  - jpeg
+  - libpng
+  - pillow
+  - numpy=1.26.4
+  - scipy=1.12.0
+  - matplotlib=3.9.0
+  - pandas=2.2.1
+  - scikit-image=0.23.2
+  - scikit-learn=1.5.0
+  - cudatoolkit=11.8     # optional placeholder — real torch/cuda should be installed via pip wheel below
+  - cudnn
+  - pytorch-mutex
+  - pip:
+      - -r file:requirements.txt
+prefix: /home/zhangs/Anaconda3/envs/mamba
